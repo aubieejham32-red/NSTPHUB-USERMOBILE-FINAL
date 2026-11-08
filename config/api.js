@@ -3,16 +3,32 @@
 | Laravel Server
 |--------------------------------------------------------------------------
 |
-| IMPORTANT:
+| EAS preview/production builds read this public build-time variable:
+| EXPO_PUBLIC_NSTPHUB_SERVER_URL
 |
-| This must be the LAN IP address of the computer running Laravel.
-|
-| Your Android phone and computer must be connected to the same network.
-|
+| Set it to a LAN URL explicitly when developing against local Laravel.
+| Without that variable, the APK uses the deployed Railway HTTPS API.
 */
 
-export const SERVER_URL =
-  'http://192.168.1.38:8000';
+const configuredServerUrl =
+  process.env.EXPO_PUBLIC_NSTPHUB_SERVER_URL;
+
+const productionServerUrl =
+  'https://nstphub-final-web-production.up.railway.app';
+
+const isDevelopment =
+  typeof __DEV__ !== 'undefined' && __DEV__;
+
+const cleanServerUrl =
+  typeof configuredServerUrl === 'string'
+    ? configuredServerUrl.trim()
+    : '';
+
+export const SERVER_URL = (
+  cleanServerUrl && (isDevelopment || /^https:\/\//i.test(cleanServerUrl))
+    ? cleanServerUrl
+    : productionServerUrl
+).replace(/\/+$/, '');
 
 
 /*

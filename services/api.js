@@ -255,7 +255,7 @@ async function apiRequest(
     }
 
     throw new Error(
-      'Cannot connect to the NSTP HUB server. Make sure Laravel is running and your phone and computer are connected to the same Wi-Fi.'
+      'Cannot connect to the NSTP HUB server. Check your internet connection and confirm the Railway backend is online.'
     );
   } finally {
     clearTimeout(
@@ -450,6 +450,15 @@ async function authenticatedRequest(
   if (
     !response.ok
   ) {
+    if (response.status === 429) {
+      const seconds = Number(response.headers.get('retry-after'));
+      const wait = Number.isFinite(seconds) && seconds > 0
+        ? ` Please wait ${Math.ceil(seconds)} seconds before trying again.`
+        : ' Please wait about a minute before trying again.';
+
+      throw new Error('Too many requests were sent to NSTP HUB.' + wait);
+    }
+
     throw new Error(
       getApiError(
         data,
@@ -4136,6 +4145,9 @@ export async function getDigitalStudentId() {
               .DIGITAL_STUDENT_ID_QR_CODE
           : null
       ),
+
+    qr_code_data_uri:
+      data?.qr_code_data_uri || null,
 
     student: {
       ...data.student,

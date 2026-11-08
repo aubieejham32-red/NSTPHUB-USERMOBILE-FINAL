@@ -299,6 +299,7 @@ export default function PreRegistrationScreen() {
       }
       edges={[
         'top',
+        'bottom',
       ]}
     >
       <Stack.Screen

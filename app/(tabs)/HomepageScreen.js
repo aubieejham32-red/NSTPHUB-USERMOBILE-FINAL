@@ -4903,14 +4903,14 @@ const createStyles = (COLORS) =>
       color:
         COLORS.readableText,
 
-      fontSize: 9,
+      fontSize: 12,
 
-      lineHeight: 12,
+      lineHeight: 17,
 
       fontWeight:
-        '600',
+        '700',
 
-      opacity: 0.72,
+      opacity: 1,
     },
 
 
@@ -4920,9 +4920,9 @@ const createStyles = (COLORS) =>
       color:
         COLORS.valueText,
 
-      fontSize: 11,
+      fontSize: 13,
 
-      lineHeight: 15,
+      lineHeight: 19,
 
       fontWeight:
         '700',
@@ -6097,6 +6097,7 @@ const createStyles = (COLORS) =>
 
 
     bottomSpace: {
-      height: 70,
+      // Leave room for the floating tab bar and Android gesture navigation.
+      height: 130,
     },
   });

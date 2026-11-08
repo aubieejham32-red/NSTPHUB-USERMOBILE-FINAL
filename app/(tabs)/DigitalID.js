@@ -1199,18 +1199,14 @@ export default function DigitalStudentIdScreen() {
           */
 
           if (
-            response
-              ?.qr_available ===
-              true
-            &&
-            response
-              ?.qr_code_url
+            response?.qr_available === true &&
+            (response?.qr_code_data_uri || response?.qr_code_url)
           ) {
-            const source =
-              await getDigitalStudentIdQrSource(
-                response
-                  .qr_code_url
-              );
+            // Prefer artwork from authenticated JSON over another native
+            // image download that may drop the Bearer token on Android.
+            const source = response?.qr_code_data_uri
+              ? { uri: response.qr_code_data_uri }
+              : await getDigitalStudentIdQrSource(response.qr_code_url);
 
 
             setQrImageSource(
@@ -1957,7 +1953,9 @@ export default function DigitalStudentIdScreen() {
                           styles.qrUnavailableText
                         }
                       >
-                        QR unavailable
+                        {credentialsReady
+                          ? 'Unable to display QR. Pull down to refresh.'
+                          : 'QR pending. Ask your university admin to generate your ID and QR credentials.'}
                       </Text>
                     </View>
                   )}

@@ -1530,6 +1530,12 @@ export default function TabLayout() {
         headerShown:
           false,
 
+        // The custom tab bar floats over each scene. Reserve physical
+        // content space so text and buttons are not hidden beneath it.
+        sceneStyle: {
+          paddingBottom: 92,
+        },
+
         tabBarHideOnKeyboard:
           true,
 

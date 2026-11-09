@@ -32,6 +32,8 @@ import {
   getStudentProfile,
 } from '../../services/api';
 
+import { getUniversityLogoUri } from '../../utils/universityLogo';
+
 
 
 import {
@@ -147,9 +149,6 @@ const COURSE_FULL_NAMES = {
   BSIS:
     'Bachelor of Science in Information Systems',
 };
-
-// Use the bundled official seal for SNSU if its remotely uploaded logo fails.
-const SNSU_LOGO = require('../../assets/images/snsu_logo.png');
 
 
 /*
@@ -678,17 +677,15 @@ export default function DigitalStudentIdScreen() {
   const universityLogoUrl =
     useMemo(
       () =>
-        normalizeLaravelMediaUrl(
-          university?.logo_url
-        ),
+        getUniversityLogoUri(university),
       [
+        university?.id,
+        university?.logo,
         university?.logo_url,
+        university?.logo_updated_at,
+        university?.updated_at,
       ]
     );
-
-  const isSnsu =
-    String(university?.acronym ?? '').trim().toUpperCase() === 'SNSU' ||
-    /surigao del norte state university/i.test(String(university?.name ?? ''));
 
 
   /*
@@ -1547,12 +1544,6 @@ export default function DigitalStudentIdScreen() {
                           );
                         }
                       }
-                    />
-                  ) : isSnsu ? (
-                    <Image
-                      source={SNSU_LOGO}
-                      style={styles.universityLogo}
-                      resizeMode="contain"
                     />
                   ) : (
                     <View

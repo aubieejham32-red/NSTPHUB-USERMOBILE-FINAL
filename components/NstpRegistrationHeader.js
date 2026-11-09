@@ -1,19 +1,22 @@
 import {
-    useState,
+  useEffect,
+  useState,
 } from 'react';
 
 import {
-    ActivityIndicator,
-    Image,
-    StyleSheet,
-    View,
+  ActivityIndicator,
+  Image,
+  StyleSheet,
+  View,
 } from 'react-native';
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import Svg, {
-    Path,
+  Path,
 } from 'react-native-svg';
+
+import { getUniversityLogoUri } from '../utils/universityLogo';
 
 
 /*
@@ -91,6 +94,12 @@ export default function NstpRegistrationHeader({
     setUniversityLogoFailed,
   ] = useState(false);
 
+  const universityLogoUri = getUniversityLogoUri(university);
+
+  useEffect(() => {
+    setUniversityLogoFailed(false);
+  }, [universityLogoUri]);
+
 
   /*
   |--------------------------------------------------------------------------
@@ -100,7 +109,7 @@ export default function NstpRegistrationHeader({
 
   const hasUniversityLogo =
     Boolean(
-      university?.logo_url
+      universityLogoUri
     )
     &&
     !universityLogoFailed;
@@ -138,14 +147,14 @@ export default function NstpRegistrationHeader({
         ) : hasUniversityLogo ? (
           <UniversityLogoBadge
             uri={
-              university.logo_url
+              universityLogoUri
             }
             onError={(
               event
             ) => {
               console.error(
                 'University logo failed:',
-                university?.logo_url,
+                universityLogoUri,
                 event
                   ?.nativeEvent
                   ?.error

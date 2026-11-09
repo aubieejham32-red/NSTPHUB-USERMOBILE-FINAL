@@ -44,6 +44,8 @@ import {
   getStudentProfile,
 } from '../../services/api';
 
+import { getUniversityLogoUri } from '../../utils/universityLogo';
+
 
 
 import {
@@ -290,6 +292,8 @@ export default function HomepageScreen() {
     homepage?.university
     ??
     {};
+
+  const universityLogoUri = getUniversityLogoUri(university);
 
 
   const schedules =
@@ -1373,26 +1377,24 @@ export default function HomepageScreen() {
                 }
               >
                 {
-                  university
-                    ?.logo_url
+                  universityLogoUri
                   &&
                   !universityLogoFailed
                     ? (
                       <Image
                         source={{
-                          uri:
-                            university
-                              .logo_url,
+                          uri: universityLogoUri,
                         }}
                         style={
                           styles.universityLogo
                         }
                         resizeMode="contain"
-                        onError={() =>
+                        onError={(event) => {
+                          console.warn('Homepage university logo failed:', universityLogoUri, event?.nativeEvent?.error);
                           setUniversityLogoFailed(
                             true
-                          )
-                        }
+                          );
+                        }}
                       />
                     )
                     : (

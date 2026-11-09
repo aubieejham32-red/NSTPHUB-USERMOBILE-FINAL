@@ -3,22 +3,22 @@ import * as DocumentPicker from 'expo-document-picker';
 import { Stack, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  ActivityIndicator,
-  Alert,
-  Image,
-  KeyboardAvoidingView,
-  Linking,
-  Modal,
-  Platform,
-  Pressable,
-  RefreshControl,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-  useWindowDimensions,
+    ActivityIndicator,
+    Alert,
+    Image,
+    KeyboardAvoidingView,
+    Linking,
+    Modal,
+    Platform,
+    Pressable,
+    RefreshControl,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    TextInput,
+    View,
+    useWindowDimensions,
 } from 'react-native';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -26,17 +26,17 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { SERVER_URL } from '../../config/api';
 
 import {
-  createStudentExcuseLetter,
-  deleteStudentExcuseLetter,
-  getStudentExcuseLetters,
-  getStudentProfile,
-  updateStudentExcuseLetter,
+    createStudentExcuseLetter,
+    deleteStudentExcuseLetter,
+    getStudentExcuseLetters,
+    getStudentProfile,
+    updateStudentExcuseLetter,
 } from '../../services/api';
 
 
 
 import {
-  useAppTheme,
+    useAppTheme,
 } from '../../contexts/ThemeContext';
 
 /* ==========================================================================
@@ -2448,6 +2448,8 @@ export default function ExcuseLetterScreen() {
                             selectedLetter
                         )
                     }
+
+                    onRefreshEvidence={() => loadLetters({ silent: true })}
                 />
             </SafeAreaView>
         );
@@ -3743,6 +3745,7 @@ function LetterDetail({
     onBack,
     onEdit,
     onDelete,
+    onRefreshEvidence,
 }) {
     const [
         menuOpen,
@@ -3771,6 +3774,11 @@ function LetterDetail({
     ] =
         useState(false);
 
+    const [
+        evidencePreviewFailed,
+        setEvidencePreviewFailed,
+    ] = useState(false);
+
 
     const status =
         normalizeStatus(
@@ -3796,6 +3804,10 @@ function LetterDetail({
         getEvidencePreviewUrl(
             letter
         );
+
+    useEffect(() => {
+        setEvidencePreviewFailed(false);
+    }, [previewUrl]);
 
 
     const openUrl =
@@ -4229,7 +4241,9 @@ function LetterDetail({
                         previewUrl ? (
                         <Pressable
                             onPress={
-                                openEvidence
+                                evidencePreviewFailed
+                                    ? onRefreshEvidence
+                                    : openEvidence
                             }
                             style={({
                                 pressed,
@@ -4245,19 +4259,35 @@ function LetterDetail({
                                     styles.evidencePreviewBox
                                 }
                             >
-                                <Image
-                                    source={{
-                                        uri:
-                                            previewUrl,
-                                    }}
-                                    style={
-                                        styles.evidencePreviewImage
-                                    }
-                                    resizeMode="contain"
-                                />
+                                {evidencePreviewFailed ? (
+                                    <View style={styles.noEvidenceBox}>
+                                        <Ionicons
+                                            name="cloud-offline-outline"
+                                            size={32}
+                                            color={themeColors.gray}
+                                        />
+                                        <Text style={styles.noEvidenceText}>
+                                            Evidence image could not be loaded.
+                                            Tap here to refresh its secure link.
+                                            If it still fails, the uploaded file
+                                            may be missing from server storage.
+                                        </Text>
+                                    </View>
+                                ) : (
+                                    <Image
+                                        source={{ uri: previewUrl }}
+                                        style={styles.evidencePreviewImage}
+                                        resizeMode="contain"
+                                        onError={event => {
+                                            console.warn('Excuse evidence preview failed:',
+                                                event?.nativeEvent?.error);
+                                            setEvidencePreviewFailed(true);
+                                        }}
+                                    />
+                                )}
 
 
-                                <View
+                                {!evidencePreviewFailed && <View
                                     style={
                                         styles.expandBadge
                                     }
@@ -4278,7 +4308,7 @@ function LetterDetail({
                                     >
                                         ENLARGE
                                     </Text>
-                                </View>
+                                </View>}
                             </View>
 
 
@@ -4301,7 +4331,9 @@ function LetterDetail({
                                         styles.tapToOpenText
                                     }
                                 >
-                                    Tap image to enlarge
+                                    {evidencePreviewFailed
+                                        ? 'Tap to retry evidence'
+                                        : 'Tap image to enlarge'}
                                 </Text>
                             </View>
                         </Pressable>

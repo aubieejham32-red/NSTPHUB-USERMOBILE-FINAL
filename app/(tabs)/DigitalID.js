@@ -148,6 +148,9 @@ const COURSE_FULL_NAMES = {
     'Bachelor of Science in Information Systems',
 };
 
+// Use the bundled official seal for SNSU if its remotely uploaded logo fails.
+const SNSU_LOGO = require('../../assets/images/snsu_logo.png');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -682,6 +685,10 @@ export default function DigitalStudentIdScreen() {
         university?.logo_url,
       ]
     );
+
+  const isSnsu =
+    String(university?.acronym ?? '').trim().toUpperCase() === 'SNSU' ||
+    /surigao del norte state university/i.test(String(university?.name ?? ''));
 
 
   /*
@@ -1540,6 +1547,12 @@ export default function DigitalStudentIdScreen() {
                           );
                         }
                       }
+                    />
+                  ) : isSnsu ? (
+                    <Image
+                      source={SNSU_LOGO}
+                      style={styles.universityLogo}
+                      resizeMode="contain"
                     />
                   ) : (
                     <View

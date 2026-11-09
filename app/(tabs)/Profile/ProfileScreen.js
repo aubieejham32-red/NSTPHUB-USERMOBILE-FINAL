@@ -3,47 +3,47 @@ import * as ImagePicker from 'expo-image-picker';
 import { Stack, useFocusEffect } from 'expo-router';
 
 import {
-    useCallback,
-    useEffect,
-    useMemo,
-    useRef,
-    useState,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
 } from 'react';
 
 import {
-    ActivityIndicator,
-    Alert,
-    Image,
-    KeyboardAvoidingView,
-    Modal,
-    PanResponder,
-    Platform,
-    Pressable,
-    RefreshControl,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
-    useWindowDimensions,
+  ActivityIndicator,
+  Alert,
+  Image,
+  KeyboardAvoidingView,
+  Modal,
+  PanResponder,
+  Platform,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  useWindowDimensions,
 } from 'react-native';
 
 import {
-    SafeAreaView,
+  SafeAreaView,
 } from 'react-native-safe-area-context';
 
 import {
-    Path,
-    Svg,
-    SvgXml,
+  Path,
+  Svg,
+  SvgXml,
 } from 'react-native-svg';
 
 import {
-    getStudentProfile,
-    updateStudentProfile,
-    updateStudentProfilePhoto,
-    updateStudentSignature,
+  getStudentProfile,
+  updateStudentProfile,
+  updateStudentProfilePhoto,
+  updateStudentSignature,
 } from '../../../services/api';
 
 
@@ -606,6 +606,10 @@ export default function StudentProfileScreen() {
     useState(
       false
     );
+
+  // A ref locks immediately; React state alone updates on the next render.
+  // Without this guard, two rapid taps can open two pickers and upload twice.
+  const photoPickerBusyRef = useRef(false);
 
 
   const [
@@ -1255,11 +1259,12 @@ export default function StudentProfileScreen() {
   const chooseProfilePhoto =
     async () => {
       if (
-        profilePhotoSaving
+        profilePhotoSaving || photoPickerBusyRef.current
       ) {
         return;
       }
 
+      photoPickerBusyRef.current = true;
 
       try {
         const permission =
@@ -1431,6 +1436,8 @@ export default function StudentProfileScreen() {
         setProfilePhotoSaving(
           false
         );
+
+        photoPickerBusyRef.current = false;
       }
     };
 
